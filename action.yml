@@ -1,0 +1,34 @@
+name: 'Build Action Server image'
+description: 'Build a docker image with a custom action for Rasa Action Server'
+inputs:
+  docker_registry:
+    description: "The name of a docker registry used that a docker image is published to"
+    required: true
+  docker_registry_login:
+    description: "Login name for a docker registry."
+    required: false
+  docker_registry_password:
+    description: "The password for a docker registry."
+    required: false
+  docker_image_name:
+    description: "Docker image name"
+    default: "action_server"
+    required: false
+  docker_image_tag:
+    description: "Docker image tag"
+    default: ${{ github.run_id }}
+    required: false
+  docker_registry_push:
+    description: "Push a docker image to the registry. If `False` the user can add manual extra steps in their workflow which use the built image"
+    default: "false"
+    required: false
+#outputs:
+# docker_registry:
+#    description: "The name of a docker registry used that a docker image is published to"
+#    value: ${{ steps.random-number-generator.outputs.random-id }}
+runs:
+  using: "composite"
+  steps:
+    - name: Hello world
+      run: echo Hello
+      shell: bash
