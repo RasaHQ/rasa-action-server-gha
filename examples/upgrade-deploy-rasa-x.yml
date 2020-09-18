@@ -1,0 +1,31 @@
+on:
+  # Deploy a new image whenever new changes were pushed to the master branch
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    name: Build Action Server image and upgrade Rasa X deployment
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - id: action_server
+      name: Build an action server with a custom actions
+      uses: RasaHQ/action-server-gha@master
+      with:
+        docker_image_name: 'rasahq/action-server-example'
+        docker_registry_login: ${{ secrets.DOCKER_HUB_LOGIN }}
+        docker_registry_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        docker_image_tag: ${{ github.sha }}
+
+    - name: Upgrade a Rasa X deployment
+      run: |
+        # More information: https://rasa.com/docs/rasa-x/installation-and-setup/install/helm-chart/
+
+        # Upgrade the helm release using output parameters from the `action_server` step
+        helm upgrade --install --reuse-values \
+          --set app.name=${{ steps.action_server.outputs.docker_image_name }} \
+          --set app.tag=${{ steps.action_server.outputs.docker_image_tag }} rasa rasa-x/rasa-x
