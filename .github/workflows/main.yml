@@ -93,7 +93,7 @@ jobs:
         run: sed -e 's/_version_/'${{ github.ref }}'/g' package.json.tmp > package.json
 
       - name: Changelog
-        uses: scottbrenner/generate-changelog-action@688a332f4b0f733da74c5e00b2393a52812cd862
+        uses: scottbrenner/generate-changelog-action@1.0.1
         id: changelog
         env:
           REPO: ${{ github.repository }}
