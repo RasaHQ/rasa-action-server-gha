@@ -1,6 +1,6 @@
 # Rasa GitHub Action
 
-You can find more information about Rasa actions in [the Rasa Open Source docs.](https://rasa.com/docs/rasa/core/actions/).
+You can find more information about Rasa actions in [the Rasa Open Source docs](https://rasa.com/docs/rasa/core/actions/).
 You can find more information about the action server in the [action server docs](https://rasa.com/docs/action-server).
 
 _You don't need to have a Dockerfile for your action server to build a Docker image, the GH action helps you to build a Docker image in the easiest way possible._
