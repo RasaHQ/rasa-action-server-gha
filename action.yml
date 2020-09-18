@@ -52,6 +52,10 @@ outputs:
     description: "Docker image name (contains an address to the registry, image name, and tag), e.g., `docker.io/my_account/my_image_name:v1.0`."
     value: ${{ steps.set-output.outputs.docker_image_full_name }}
 
+branding:
+  icon: 'layers'  
+  color: 'blue'
+  
 runs:
   using: "composite"
   steps:
