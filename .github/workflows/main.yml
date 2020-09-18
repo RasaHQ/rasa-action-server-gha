@@ -90,7 +90,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get release version
-        run: sed -e 's/_version_/'${{ github.ref }}'/g' package.json.tmp > package.json
+        run: sed -e 's/_version_/'${GITHUB_REF#refs/tags/}'/g' package.json.tmp > package.json
 
       - name: Changelog
         uses: scottbrenner/generate-changelog-action@1.0.1
