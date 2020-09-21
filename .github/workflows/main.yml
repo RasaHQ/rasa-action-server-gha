@@ -74,11 +74,12 @@ jobs:
           -v 'package_name=test-image' -v 'package_version=${{ github.sha }}'  --format=json | jq -r .data.repository.packages.edges[].node.version.id)
 
         echo "::set-output name=package_id::${PACKAGE_ID}"
-
-    - name: Delete the Docker image
-      uses: actions/delete-package-versions@v1
-      with:
-        package-version-ids: ${{ steps.get_package_id.outputs.package_id }}
+        
+    # Public package versions are not eligible for deletion
+    #- name: Delete the Docker image
+    #  uses: actions/delete-package-versions@v1
+    #  with:
+    #    package-version-ids: ${{ steps.get_package_id.outputs.package_id }}
 
   release:
     name: Create Release
