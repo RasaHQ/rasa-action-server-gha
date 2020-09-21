@@ -14,7 +14,7 @@ jobs:
   my_first_job:
     steps:
       - name: My first step
-        uses: uses: RasaHQ/action-server-gha@master
+        uses: RasaHQ/action-server-gha@master
         with:
           actions_directory: my_directory
           requirements_file: my_file
