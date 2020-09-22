@@ -11,6 +11,14 @@ jobs:
   test_action:
     runs-on: ubuntu-latest
     name: Test GH action
+
+    # Run local registry
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
     steps:
     - uses: actions/checkout@v2
     - id: action
@@ -18,16 +26,16 @@ jobs:
       uses: ./
       with:
         actions_directory: 'examples/actions'
-        docker_registry: 'docker.pkg.github.com'
-        docker_image_name: 'rasahq/action-server-gha/test-image'
-        docker_registry_login: ${{ github.actor }}
-        docker_registry_password: ${{ secrets.GITHUB_TOKEN }}
+        docker_registry: '127.0.0.1:5000'
+        docker_image_name: 'test-image'
+        docker_registry_login: ${{ secrets.DOCKER_REGISTRY_LOGIN }}
+        docker_registry_password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
         docker_image_tag: ${{ github.sha }}
         dockerfile: 'examples/Dockerfile'
         requirements_file: 'examples/requirements.txt'
 
     - name: Check output - docker_image_name
-      if: steps.action.outputs.docker_image_name != 'docker.pkg.github.com/rasahq/action-server-gha/test-image'
+      if: steps.action.outputs.docker_image_name != '127.0.0.1:5000/test-image'
       run: echo "::error::docker_image_name=${{ steps.action.outputs.docker_image_name }}" && exit 1
 
     - name: Check output - docker_image_tag
@@ -35,8 +43,8 @@ jobs:
       run: echo "::error::docker_image_tag=${{ steps.action.outputs.docker_image_tag }} != ${{ github.sha }}" && exit 1
 
     - name: Check output - docker_image_full_name
-      if: steps.action.outputs.docker_image_full_name != format('docker.pkg.github.com/rasahq/action-server-gha/test-image:{0}', github.sha)
-      run: echo "::error::docker_image_full_name=${{ steps.action.outputs.docker_image_full_name }} != ${{ format('docker.pkg.github.com/rasahq/action-server-gha/test-image:{0}', github.sha) }}" && exit 1
+      if: steps.action.outputs.docker_image_full_name != format('127.0.0.1:5000/test-image:{0}', github.sha)
+      run: echo "::error::docker_image_full_name=${{ steps.action.outputs.docker_image_full_name }} != ${{ format('127.0.0.1:5000/test-image:{0}', github.sha) }}" && exit 1
 
     - name: Pull image and run actions
       run: |
@@ -61,25 +69,6 @@ jobs:
         test -n "$(curl -s http://localhost:5055/actions | jq -r '.[] | select(.name=="action_search_venues") | .name')"
         test -n "$(curl -s http://localhost:5055/actions | jq -r '.[] | select(.name=="action_show_concert_reviews") | .name')"
         test -n "$(curl -s http://localhost:5055/actions | jq -r '.[] | select(.name=="action_show_venue_reviews") | .name')"
-
-    - name: Install graphqurl
-      run: sudo npm install -g graphqurl
-
-    - name: Get the package ID
-      id: get_package_id
-      run: |
-        # Get the package ID
-        PACKAGE_ID=$(graphqurl https://api.github.com/graphql -H "Authorization: bearer ${{ secrets.GITHUB_TOKEN }}" \
-          --queryFile=.github/get-package-id.graphql -v 'name=action-server-gha' -v 'owner=${{ github.repository_owner }}' \
-          -v 'package_name=test-image' -v 'package_version=${{ github.sha }}'  --format=json | jq -r .data.repository.packages.edges[].node.version.id)
-
-        echo "::set-output name=package_id::${PACKAGE_ID}"
-        
-    # Public package versions are not eligible for deletion
-    #- name: Delete the Docker image
-    #  uses: actions/delete-package-versions@v1
-    #  with:
-    #    package-version-ids: ${{ steps.get_package_id.outputs.package_id }}
 
   release:
     name: Create Release
