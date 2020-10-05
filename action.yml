@@ -102,14 +102,14 @@ runs:
         # Get the latest version
         if [[ "${{ inputs.rasa_sdk_version }}" == "latest" ]]; then
           LATEST_RASA_SDK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/releases" | jq -r .[].tag_name | grep -v refs | sort -Vr | head -n1)
-          echo "name=RASA_SDK_VERSION::${LATEST_RASA_SDK_VERSION}" >> $GITHUB_ENV
+          echo "RASA_SDK_VERSION=${LATEST_RASA_SDK_VERSION}" >> $GITHUB_ENV
         else
           # Validate Rasa SDK version
           CHECK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/releases" | jq -r '.[] | select(.tag_name=="${{ inputs.rasa_sdk_version }}") | .tag_name')
           if [[ "$CHECK_VERSION" != "${{ inputs.rasa_sdk_version }}" ]]; then
             echo "::error::Rasa SDK in ${{ inputs.rasa_sdk_version }} version doesn't exist. Check if the given Rasa SDK version is valid, https://github.com/RasaHQ/rasa-sdk/releases" && exit 1
           fi
-          echo "name=RASA_SDK_VERSION::${{ inputs.rasa_sdk_version }}" >> $GITHUB_ENV
+          echo "RASA_SDK_VERSION=${{ inputs.rasa_sdk_version }}" >> $GITHUB_ENV
         fi
 
     - name: Docker login
