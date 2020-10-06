@@ -53,9 +53,9 @@ outputs:
     value: ${{ steps.set-output.outputs.docker_image_full_name }}
 
 branding:
-  icon: 'layers'  
+  icon: 'layers'
   color: 'blue'
-  
+
 runs:
   using: "composite"
   steps:
@@ -101,13 +101,13 @@ runs:
       run: |
         # Get the latest version
         if [[ "${{ inputs.rasa_sdk_version }}" == "latest" ]]; then
-          LATEST_RASA_SDK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/releases" | jq -r .[].tag_name | grep -v refs | sort -Vr | head -n1)
+          LATEST_RASA_SDK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/tags" | jq -r .[].name | grep -v refs | sort -Vr | head -n1)
           echo "::set-env name=RASA_SDK_VERSION::${LATEST_RASA_SDK_VERSION}"
         else
           # Validate Rasa SDK version
-          CHECK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/releases" | jq -r '.[] | select(.tag_name=="${{ inputs.rasa_sdk_version }}") | .tag_name')
+          CHECK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/tags" | jq -r '.[] | select(.name=="${{ inputs.rasa_sdk_version }}") | .name')
           if [[ "$CHECK_VERSION" != "${{ inputs.rasa_sdk_version }}" ]]; then
-            echo "::error::Rasa SDK in ${{ inputs.rasa_sdk_version }} version doesn't exist. Check if the given Rasa SDK version is valid, https://github.com/RasaHQ/rasa-sdk/releases" && exit 1
+            echo "::error::Rasa SDK in ${{ inputs.rasa_sdk_version }} version doesn't exist. Check if the given Rasa SDK version is valid, https://github.com/RasaHQ/rasa-sdk/tags" && exit 1
           fi
           echo "::set-env name=RASA_SDK_VERSION::${{ inputs.rasa_sdk_version }}"
         fi
