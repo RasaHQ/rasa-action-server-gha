@@ -53,9 +53,9 @@ outputs:
     value: ${{ steps.set-output.outputs.docker_image_full_name }}
 
 branding:
-  icon: 'layers'  
+  icon: 'layers'
   color: 'blue'
-  
+
 runs:
   using: "composite"
   steps:
@@ -64,13 +64,13 @@ runs:
       run: |-
         # Set Dockerfile
         if [[ "${{ inputs.dockerfile }}" == "" ]]; then
-          echo "::set-env name=DOCKERFILE::${{ github.action_path }}/default_files/Dockerfile"
+          echo "DOCKERFILE=${{ github.action_path }}/default_files/Dockerfile" >> $GITHUB_ENV
         else
-          echo "::set-env name=DOCKERFILE::${{ inputs.dockerfile }}"
+          echo "DOCKERFILE=${{ inputs.dockerfile }}" >> $GITHUB_ENV
         fi
 
         # Set DOCKER_IMAGE_FULL_NAME
-        echo "::set-env name=DOCKER_IMAGE_FULL_NAME::${{ inputs.docker_registry }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}"
+        echo "DOCKER_IMAGE_FULL_NAME=${{ inputs.docker_registry }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}" >> $GITHUB_ENV
 
     - name: Copy files
       shell: bash
@@ -99,17 +99,18 @@ runs:
     - name: Set the Rasa SDK version
       shell: bash
       run: |
+        DOCKERHUB_TAGS_URL="https://registry.hub.docker.com/v2/repositories/rasa/rasa-sdk/tags?page_size=10000"
         # Get the latest version
         if [[ "${{ inputs.rasa_sdk_version }}" == "latest" ]]; then
-          LATEST_RASA_SDK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/releases" | jq -r .[].tag_name | grep -v refs | sort -Vr | head -n1)
-          echo "::set-env name=RASA_SDK_VERSION::${LATEST_RASA_SDK_VERSION}"
+          LATEST_RASA_SDK_VERSION=$(curl -s ${DOCKERHUB_TAGS_URL} | jq -r '.results[].name' | grep -vE 'refs|aws|latest' | sort -Vr | head -n1)
+          echo "RASA_SDK_VERSION=${LATEST_RASA_SDK_VERSION}" >> $GITHUB_ENV
         else
           # Validate Rasa SDK version
-          CHECK_VERSION=$(curl --silent "https://api.github.com/repos/RasaHQ/rasa-sdk/releases" | jq -r '.[] | select(.tag_name=="${{ inputs.rasa_sdk_version }}") | .tag_name')
+          CHECK_VERSION=$(curl --silent ${DOCKERHUB_TAGS_URL} | jq -r '.results[] | select(.name=="${{ inputs.rasa_sdk_version }}") | .name')
           if [[ "$CHECK_VERSION" != "${{ inputs.rasa_sdk_version }}" ]]; then
-            echo "::error::Rasa SDK in ${{ inputs.rasa_sdk_version }} version doesn't exist. Check if the given Rasa SDK version is valid, https://github.com/RasaHQ/rasa-sdk/releases" && exit 1
+            echo "::error::Rasa SDK in ${{ inputs.rasa_sdk_version }} version doesn't exist. Check if the given Rasa SDK version is valid, https://hub.docker.com/r/rasa/rasa-sdk/tags" && exit 1
           fi
-          echo "::set-env name=RASA_SDK_VERSION::${{ inputs.rasa_sdk_version }}"
+          echo "RASA_SDK_VERSION=${{ inputs.rasa_sdk_version }}" >> $GITHUB_ENV
         fi
 
     - name: Docker login
@@ -131,7 +132,6 @@ runs:
         echo "    DOCKER_IMAGE_NAME: ${{ inputs.docker_image_name }}"
         echo "    DOCKER_IMAGE_TAG: ${{ inputs.docker_image_tag }}"
         echo "    RASA_SDK_VERSION: ${{ env.RASA_SDK_VERSION }}"
-        echo "    REQUIREMENTS_FILE: ${{ env.REQUIREMENTS_FILE }}"
         echo ""
         echo "  Docker build extra arguments: ${{ inputs.docker_build_args}}"
         echo ""
@@ -141,7 +141,6 @@ runs:
           --build-arg GITHUB_REF="$GITHUB_REF" \
           --build-arg DOCKER_IMAGE_NAME="${{ inputs.docker_image_name }}" \
           --build-arg RASA_SDK_VERSION="${{ env.RASA_SDK_VERSION }}" \
-          --build-arg REQUIREMENTS_FILE="${{ env.REQUIREMENTS_FILE }}" \
           --build-arg DOCKER_IMAGE_TAG="${{ inputs.docker_image_tag }}" ${{ inputs.docker_build_args }}\
           -f ${{ env.DOCKERFILE }} ${{ github.workspace }}
       shell: bash
