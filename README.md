@@ -1,4 +1,4 @@
-# Rasa GitHub Action
+# Rasa Build Action Server GitHub Action
 
 You can find more information about Rasa actions in [the Rasa Open Source docs](https://rasa.com/docs/rasa/core/actions/).
 You can find more information about the action server in the [action server docs](https://rasa.com/docs/action-server).
@@ -14,7 +14,7 @@ jobs:
   my_first_job:
     steps:
       - name: My first step
-        uses: RasaHQ/action-server-gha@master
+        uses: RasaHQ/rasa-action-server-gha@master
         with:
           actions_directory: my_directory
           requirements_file: my_file
@@ -60,7 +60,7 @@ jobs:
         steps:
             # ...
             - name: Build an action server
-              uses: RasaHQ/action-server-gha@master
+              uses: RasaHQ/rasa-action-server-gha@master
               with:
                 docker_image_name: 'rasahq/action-server-example'
                 # More details on how to use GitHub secrets:
@@ -83,7 +83,7 @@ jobs:
         steps:
             # ...
             - name: Build an action server
-              uses: RasaHQ/action-server-gha@master
+              uses: RasaHQ/rasa-action-server-gha@master
               with:
                 docker_image_name: 'rasahq/action-server-example'
                 # More details on how to use GitHub secrets:
@@ -119,7 +119,7 @@ jobs:
 
     - id: action_server
       name: Build an action server with custom actions
-      uses: RasaHQ/action-server-gha@master
+      uses: RasaHQ/rasa-action-server-gha@master
       with:
         docker_image_name: 'rasahq/action-server-example'
         docker_registry_login: ${{ secrets.DOCKER_HUB_LOGIN }}
@@ -153,7 +153,7 @@ jobs:
         steps:
             # ...
             - name: Build an action server
-              uses: RasaHQ/action-server-gha
+              uses: RasaHQ/rasa-action-server-gha
               with:
                 actions_directory: 'examples/actions'
                 # Push a Docker image into GitHub Container Registry
