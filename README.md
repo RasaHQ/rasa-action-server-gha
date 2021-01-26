@@ -14,7 +14,7 @@ jobs:
   my_first_job:
     steps:
       - name: My first step
-        uses: RasaHQ/rasa-action-server-gha@master
+        uses: RasaHQ/rasa-action-server-gha@main
         with:
           actions_directory: my_directory
           requirements_file: my_file
@@ -60,7 +60,7 @@ jobs:
         steps:
             # ...
             - name: Build an action server
-              uses: RasaHQ/rasa-action-server-gha@master
+              uses: RasaHQ/rasa-action-server-gha@main
               with:
                 docker_image_name: 'rasahq/action-server-example'
                 # More details on how to use GitHub secrets:
@@ -83,7 +83,7 @@ jobs:
         steps:
             # ...
             - name: Build an action server
-              uses: RasaHQ/rasa-action-server-gha@master
+              uses: RasaHQ/rasa-action-server-gha@main
               with:
                 docker_image_name: 'rasahq/action-server-example'
                 # More details on how to use GitHub secrets:
@@ -104,10 +104,10 @@ In the example was used [the Rasa X helm chart](https://github.com/RasaHQ/rasa-x
 
 ```yaml
 on:
-  # Deploy a new image whenever new changes were pushed to the master branch
+  # Deploy a new image whenever new changes were pushed to the main branch
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build_and_deploy:
@@ -119,7 +119,7 @@ jobs:
 
     - id: action_server
       name: Build an action server with custom actions
-      uses: RasaHQ/rasa-action-server-gha@master
+      uses: RasaHQ/rasa-action-server-gha@main
       with:
         docker_image_name: 'rasahq/action-server-example'
         docker_registry_login: ${{ secrets.DOCKER_HUB_LOGIN }}

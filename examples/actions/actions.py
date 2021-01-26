@@ -1,4 +1,4 @@
-# Concertbot example: https://github.com/RasaHQ/rasa/tree/master/examples/concertbot
+# Concertbot example: https://github.com/RasaHQ/rasa/tree/main/examples/concertbot
 from rasa_sdk import Action
 from rasa_sdk.events import SlotSet
 
