@@ -88,7 +88,7 @@ jobs:
           echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
 
       - name: Changelog
-        uses: scottbrenner/generate-changelog-action@1.0.1
+        uses: scottbrenner/generate-changelog-action@f17b985298496cf8df35aa1104091c51e7bfea95 #1.3.3
         id: changelog
         env:
           REPO: ${{ github.repository }}
