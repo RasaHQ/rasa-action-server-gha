@@ -102,7 +102,7 @@ runs:
         DOCKERHUB_TAGS_URL="https://registry.hub.docker.com/v2/repositories/rasa/rasa-sdk/tags?page_size=10000"
         # Get the latest version
         if [[ "${{ inputs.rasa_sdk_version }}" == "latest" ]]; then
-          LATEST_RASA_SDK_VERSION=$(curl -s ${DOCKERHUB_TAGS_URL} | jq -r '.results[].name' | grep -vE 'refs|aws|latest' | sort -Vr | head -n1)
+          LATEST_RASA_SDK_VERSION=$(curl -sL ${DOCKERHUB_TAGS_URL} | jq -r '.results[].name' | grep -vE 'refs|aws|latest' | sort -Vr | head -n1)
           echo "RASA_SDK_VERSION=${LATEST_RASA_SDK_VERSION}" >> $GITHUB_ENV
         else
           # Validate Rasa SDK version
